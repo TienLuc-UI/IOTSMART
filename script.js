@@ -102,6 +102,41 @@ const gasThreshold2 = document.getElementById('gasThreshold2');
 const tempThreshold2 = document.getElementById('tempThreshold2');
 const humidityHighThreshold2 = document.getElementById('humidityHighThreshold2');
 
+// Đọc ngưỡng cảnh báo từ Firebase khi khởi động
+function loadThresholdsFromFirebase() {
+    database.ref('thresholds').once('value', (snapshot) => {
+        if (snapshot.exists()) {
+            const fbThresholds = snapshot.val();
+            
+            // Cập nhật ngưỡng từ Firebase cho phòng 1
+            if (fbThresholds.room1) {
+                if (fbThresholds.room1.temperature) {
+                    THRESHOLDS.room1.temperature = fbThresholds.room1.temperature;
+                }
+                if (fbThresholds.room1.humidity && fbThresholds.room1.humidity.high) {
+                    THRESHOLDS.room1.humidity.high = fbThresholds.room1.humidity.high;
+                }
+            }
+            
+            // Cập nhật ngưỡng từ Firebase cho phòng 2
+            if (fbThresholds.room2) {
+                if (fbThresholds.room2.temperature) {
+                    THRESHOLDS.room2.temperature = fbThresholds.room2.temperature;
+                }
+                if (fbThresholds.room2.humidity && fbThresholds.room2.humidity.high) {
+                    THRESHOLDS.room2.humidity.high = fbThresholds.room2.humidity.high;
+                }
+            }
+            
+            // Cập nhật giao diện với giá trị từ Firebase
+            initializeThresholdValues();
+        } else {
+            // Nếu chưa có dữ liệu ngưỡng, tạo mới với giá trị mặc định
+            database.ref('thresholds').set(THRESHOLDS);
+        }
+    });
+}
+
 // Khởi tạo thiết lập ngưỡng mặc định cho giao diện
 function initializeThresholdValues() {
     // Phòng 1
@@ -125,6 +160,14 @@ function setupSettingsControls() {
         THRESHOLDS.room1.temperature = parseInt(tempThreshold1.value);
         THRESHOLDS.room1.humidity.high = parseInt(humidityHighThreshold1.value);
         
+        // Lưu ngưỡng vào Firebase
+        database.ref('thresholds/room1').update({
+            temperature: THRESHOLDS.room1.temperature,
+            humidity: {
+                high: THRESHOLDS.room1.humidity.high
+            }
+        });
+        
         // Cập nhật kiểm tra cảnh báo
         processRoom1Data();
         
@@ -141,6 +184,14 @@ function setupSettingsControls() {
         // Cập nhật ngưỡng cho Phòng 2
         THRESHOLDS.room2.temperature = parseInt(tempThreshold2.value);
         THRESHOLDS.room2.humidity.high = parseInt(humidityHighThreshold2.value);
+        
+        // Lưu ngưỡng vào Firebase
+        database.ref('thresholds/room2').update({
+            temperature: THRESHOLDS.room2.temperature,
+            humidity: {
+                high: THRESHOLDS.room2.humidity.high
+            }
+        });
         
         // Cập nhật kiểm tra cảnh báo
         processRoom2Data();
@@ -474,8 +525,8 @@ function processRoom2Data() {
 
 // Khởi tạo ứng dụng
 function initializeApp() {
-    // Khởi tạo giá trị ngưỡng
-    initializeThresholdValues();
+    // Đọc ngưỡng từ Firebase trước
+    loadThresholdsFromFirebase();
     
     // Thiết lập điều khiển cài đặt
     setupSettingsControls();
