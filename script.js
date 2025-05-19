@@ -20,7 +20,7 @@ const DEFAULT_THRESHOLDS = {
     humidity: {
         high: 80        // % - ngưỡng cảnh báo độ ẩm cao
     },
-    flame: 1            // 1 = phát hiện lửa, 0 = không phát hiện
+    flame: 0            // 1 = phát hiện lửa, 0 = không phát hiện
 };
 
 // Đối tượng lưu trữ trạng thái ngưỡng cho từng phòng
