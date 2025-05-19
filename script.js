@@ -203,8 +203,8 @@ function setupSettingsControls() {
 
 // Xử lý nút bật/tắt buzzer và LED
 function setupAlertControls() {
-    // Khởi tạo trạng thái buzzer ban đầu
-    database.ref('controls/buzzer').once('value', (snapshot) => {
+    // Lắng nghe liên tục trạng thái buzzer từ Firebase
+    database.ref('controls/buzzer').on('value', (snapshot) => {
         if (snapshot.exists()) {
             buzzerEnabled = snapshot.val() === 1;
             alertToggle.checked = buzzerEnabled;
@@ -216,8 +216,8 @@ function setupAlertControls() {
         }
     });
     
-    // Khởi tạo trạng thái LED ban đầu
-    database.ref('controls/led').once('value', (snapshot) => {
+    // Lắng nghe liên tục trạng thái LED từ Firebase
+    database.ref('controls/led').on('value', (snapshot) => {
         if (snapshot.exists()) {
             ledEnabled = snapshot.val() === 1;
             ledToggle.checked = ledEnabled;
@@ -536,32 +536,4 @@ function initializeApp() {
 }
 
 // Khởi động ứng dụng
-initializeApp();
-
-// Hàm mô phỏng dữ liệu cho mục đích test (bỏ comment nếu muốn dùng)
-function simulateData() {
-    // Giá trị ngẫu nhiên để kiểm tra giao diện
-    const room1Data = {
-        gas: Math.floor(Math.random() * 1000),
-        temperature: Math.floor(Math.random() * 60),
-        humidity: Math.floor(Math.random() * 100),
-        flame: Math.random() > 0.8 ? 1 : 0 // 20% cơ hội có lửa
-    };
-    
-    const room2Data = {
-        gas: Math.floor(Math.random() * 1000),
-        temperature: Math.floor(Math.random() * 60),
-        humidity: Math.floor(Math.random() * 100),
-        flame: Math.random() > 0.8 ? 1 : 0 // 20% cơ hội có lửa
-    };
-    
-    // Cập nhật Firebase
-    database.ref('rooms/room1').set(room1Data);
-    database.ref('rooms/room2').set(room2Data);
-    
-    // Cập nhật mỗi 5 giây
-    setTimeout(simulateData, 5000);
-}
-
-// Uncomment dòng sau để bắt đầu mô phỏng dữ liệu
-// simulateData(); 
+initializeApp(); 
